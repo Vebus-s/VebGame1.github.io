@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Tenis</title>
+      <style>
+          body {
+              margin: 0;
+              padding: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              background-color: darkgray;
+          }
+          canvas {
+              border: 3px solid #fff
+          }
+      </style>
+  </head>
+
+  <body>
+      
+      <canvas></canvas>
+      <script>
+          const canvas = document.querySelector('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          canvas.width = 1000;
+          canvas.height = 500;
+          
+          const cw = canvas.width;
+          const ch = canvas.height;
+          
+          const ball_size = 20;
+          let ballX = cw / 2 - ball_size /2;
+          let ballY = ch / 2 - ball_size /2;
+          
+          const paddelHeight = 100;
+          const paddelWidth = 20;
+          
+          const playerX = 70;
+          const aiX = 910;
+          
+          let playerY = 200;
+          let aiY = 200;
+          
+          const lineWidth = 6;
+          const lineHeight = 16;
+          
+          let  ballSpeedX = 4;
+          let ballSpeedY = 4;
+          
+          var score = 0;
+          
+          function player(){
+              ctx.fillStyle = 'green';
+              ctx.fillRect(playerX, playerY, paddelWidth, paddelHeight);
+              
+              if(ballX - paddelHeight/3 <= playerX && ballY >= playerY - ball_size && ballY <= playerY + paddelHeight){
+                ballSpeedX = -ballSpeedX;
+                ballSpeedY = -ballSpeedY;
+                  score+=1;
+              }
+          }
+          
+          function AI(){
+              ctx.fillStyle = 'yellow';
+              ctx.fillRect(aiX, aiY, paddelWidth, paddelHeight);
+              
+              if (ballX + ball_size >= aiX && ballY <= aiY + paddelHeight && ballY >= aiY - ball_size){
+                ballSpeedX = -ballSpeedX;
+                ballSpeedY = -ballSpeedY;  
+              }
+          }
+          
+          function ball(){
+              ctx.fillStyle='#ffffff';
+              ctx.fillRect(ballX, ballY, ball_size, ball_size);
+              
+              ballX += ballSpeedX;
+              ballY += ballSpeedY;
+              //odbijanie od sciany
+              if(ballY <= 0 || ballY +ball_size >= ch){
+                ballSpeedY = -ballSpeedY;
+                  speedUp();
+              }
+              if(ballX <= 0 || ballX + ball_size >= cw){
+                  ballSpeedX = 0;
+                  ballSpeedY = 0;
+                  speedUp();
+                  
+                  window.location.reload(true);
+                  alert("Twój wynik to " + score + "\n Aby zagrac wciśnij OK");
+              }
+              
+             
+              
+              
+              
+          }
+          
+          function table() {
+              //stół
+              ctx.fillStyle = 'black';
+              ctx.fillRect(0,0,cw,ch);
+             
+              //kreski
+              for(let linePosition = 20; linePosition < ch; linePosition+=30){
+                  ctx.fillStyle='gray';
+                  ctx.fillRect(cw / 2 - lineWidth/2, linePosition, lineWidth, lineHeight);
+              }
+          }
+          
+          topCanvas = canvas.offsetTop;
+          console.log(topCanvas)
+          
+          function playerPosition(e){
+              //console.log("pozycja myszy to " + (e.clientY - topCanvas));
+              playerY = e.clientY - topCanvas - paddelHeight/2;
+              
+              
+              if(playerY >= ch - paddelHeight){
+                  playerY = ch - paddelHeight;
+              }
+              
+              if(playerY <= 0){
+                  playerY=0;
+              }
+              //aiY = playerY;
+              
+          }
+          
+          function speedUp(){
+              if(ballSpeedX > 0 && ballSpeedX < 25){
+                  ballSpeedX += 1;
+              }
+              else if (ballSpeedX < 0 && ballSpeedX > -25){
+                  ballSpeedX -=1;
+              }
+              
+          }
+          
+          function aiPosition(){
+              aiY = ballY - paddelHeight/2;
+              /*
+              var middlePaddel = aiY + paddelHeight /2;
+              var middleBall = ballY + ball_size/2;
+              
+              if(ballX > 500){
+                  if(middlePaddel - middleBall > 200){
+                      
+                  }
+              }
+              
+              else if(ballX <= 500 && ballX > 150){}*/
+          }
+          
+          canvas.addEventListener("mousemove", 
+                                  playerPosition);
+          
+          function game(){
+          table();
+          ball();
+          player();
+          AI();
+          aiPosition();
+          }
+          
+          setInterval(game, 1000 / 60);
+          
+          
+      </script>
+  </body>
+
+</html>
